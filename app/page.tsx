@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ButtonElementt } from "./component/ButtonElementt";
 
 export default function Home() {
   const [display, setDisplay] = useState("0");
@@ -83,26 +84,24 @@ export default function Home() {
           </button>
 
           {[7, 8, 9, 4, 5, 6, 1, 2, 3].map((digit) => (
-            <button
+            <ButtonElementt
               key={digit}
-              className="rounded-2xl bg-slate-200 py-4 text-lg font-semibold text-slate-900 hover:bg-slate-300"
-              onClick={() => appendDigit(String(digit))}
-            >
-              {digit}
-            </button>
+              label={String(digit)}
+              event={() => appendDigit(String(digit))}
+              sizeWidth={1}
+            />
           ))}
-          <button
-            className="col-span-2 rounded-2xl bg-slate-200 py-4 text-lg font-semibold text-slate-900 hover:bg-slate-300"
-            onClick={() => appendDigit("0")}
-          >
-            0
-          </button>
-          <button
-            className="rounded-2xl bg-emerald-600 py-4 text-lg font-semibold text-white hover:bg-emerald-700"
-            onClick={handleEqual}
-          >
-            =
-          </button>
+          <ButtonElementt
+            label={"0"}
+            event={() => appendDigit("0")}
+            sizeWidth={2}
+          />
+          <ButtonElementt
+            label={"="}
+            event={handleEqual}
+            sizeWidth={1}
+            backgroundColor={"bg-emerald-600"}
+          />
         </div>
       </div>
     </div>
