@@ -75,7 +75,8 @@ export default function Home() {
       if (a === 0) return ["Hệ số a ≠ 0"];
 
       const p = (3 * a * c - b * b) / (3 * a * a);
-      const q = (2 * b * b * b - 9 * a * b * c + 27 * a * a * d) / (27 * a * a * a);
+      const q =
+        (2 * b * b * b - 9 * a * b * c + 27 * a * a * d) / (27 * a * a * a);
       const disc = -(4 * p * p * p + 27 * q * q);
 
       if (disc > 0) {
@@ -84,8 +85,12 @@ export default function Home() {
         const offset = b / (3 * a);
         // ❌ [Lặp code] Format x = ... lặp lại lần 3, 4, 5
         list.push(`x1 = ${(m * Math.cos(theta) - offset).toFixed(4)}`);
-        list.push(`x2 = ${(m * Math.cos(theta - (2 * Math.PI) / 3) - offset).toFixed(4)}`);
-        list.push(`x3 = ${(m * Math.cos(theta - (4 * Math.PI) / 3) - offset).toFixed(4)}`);
+        list.push(
+          `x2 = ${(m * Math.cos(theta - (2 * Math.PI) / 3) - offset).toFixed(4)}`,
+        );
+        list.push(
+          `x3 = ${(m * Math.cos(theta - (4 * Math.PI) / 3) - offset).toFixed(4)}`,
+        );
       } else {
         const sqrtD = Math.sqrt(-disc / 108);
         const u = Math.cbrt(-q / 2 + sqrtD);
@@ -199,14 +204,16 @@ export default function Home() {
       setWaitingForNext(false);
       return;
     }
-    setDisplay((cur) => (cur === "0" || cur.endsWith(":") ? digit : cur + digit));
+    setDisplay((cur) =>
+      cur === "0" || cur.endsWith(":") ? digit : cur + digit,
+    );
   };
 
   const computeResult = (prev: number, next: number, op: string) => {
     if (op === "+") return prev + next;
     if (op === "-") return prev - next;
     if (op === "×") return prev * next;
-    if (op === "÷") return next !== 0 ? prev / next : NaN;
+    if (op === "÷") return prev / next; //test edge cases //next !== 0 ? prev / next : NaN;
     return next;
   };
 
@@ -235,7 +242,10 @@ export default function Home() {
   };
 
   const handleClear = () => {
-    if (inSolver) { resetSolver(); return; }
+    if (inSolver) {
+      resetSolver();
+      return;
+    }
     setDisplay("0");
     setOperator(null);
     setPreviousValue(null);
@@ -243,23 +253,30 @@ export default function Home() {
   };
 
   // Hint hiển thị dưới màn hình
-  const hint = solverStep === "select"
-    ? "Mode: PT tiếp theo / OK: Xác nhận"
-    : solverStep === "input"
-    ? "Nhập số → OK xác nhận"
-    : solverStep === "result"
-    ? "OK: nghiệm tiếp / Mode: thoát"
-    : "";
+  const hint =
+    solverStep === "select"
+      ? "Mode: PT tiếp theo / OK: Xác nhận"
+      : solverStep === "input"
+        ? "Nhập số → OK xác nhận"
+        : solverStep === "result"
+          ? "OK: nghiệm tiếp / Mode: thoát"
+          : "";
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl shadow-slate-200">
-        <h1 className="text-center text-3xl font-semibold mb-4">Máy tính Next.js</h1>
+        <h1 className="text-center text-3xl font-semibold mb-4">
+          Máy tính Next.js
+        </h1>
 
         <div className="rounded-2xl bg-slate-950 p-5 mb-1 min-h-[96px] flex flex-col items-end justify-end">
-          <span className="text-4xl font-bold text-white break-all text-right">{display}</span>
+          <span className="text-4xl font-bold text-white break-all text-right">
+            {display}
+          </span>
         </div>
-        <div className="text-right text-xs text-slate-400 mb-4 min-h-[16px]">{hint}</div>
+        <div className="text-right text-xs text-slate-400 mb-4 min-h-[16px]">
+          {hint}
+        </div>
 
         <div className="grid grid-cols-4 gap-4">
           {/* Hàng 1 */}
