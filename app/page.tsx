@@ -20,6 +20,8 @@ export default function Home() {
   const computeResult = (prev: number, next: number, op: string) => {
     if (op === "+") return prev + next;
     if (op === "-") return prev - next;
+    if (op === "×") return prev * next;
+    if (op === "÷") return prev / next; //test edge cases //next !== 0 ? prev / next : NaN;
     return next;
   };
 
@@ -68,6 +70,18 @@ export default function Home() {
             onClick={handleClear}
           >
             C
+          </button>
+          <button
+            className="rounded-2xl bg-blue-600 py-4 text-lg font-semibold text-white hover:bg-blue-700"
+            onClick={() => handleOperator("÷")}
+          >
+            ÷
+          </button>
+          <button
+            className="rounded-2xl bg-blue-600 py-4 text-lg font-semibold text-white hover:bg-blue-700"
+            onClick={() => handleOperator("×")}
+          >
+            ×
           </button>
           <button
             className="rounded-2xl bg-blue-600 py-4 text-lg font-semibold text-white hover:bg-blue-700"
