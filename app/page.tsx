@@ -2,17 +2,10 @@
 
 import { useState } from "react";
 
-// ❌ [SOLID - SRP] Component này làm quá nhiều việc: máy tính thông thường + giải PT bậc 2 + giải PT bậc 3
-//    + quản lý flow mode + validate input + format kết quả — tất cả trong 1 component duy nhất.
-
-// ❌ [SOLID - OCP] Muốn thêm PT bậc 4 phải sửa trực tiếp vào handleOK và solveEquation,
-//    không có cơ chế mở rộng nào.
-
 type SolverStep = "idle" | "select" | "input" | "result";
 
 const DEGREES = [2, 3];
 
-// ❌ [Khó mở rộng] Muốn thêm bậc 4 phải thêm thủ công vào đây và vào solveEquation
 const COEFF_LABELS: Record<number, string[]> = {
   2: ["a", "b", "c"],
   3: ["a", "b", "c", "d"],
@@ -39,22 +32,18 @@ export default function Home() {
 
   const inSolver = solverStep !== "idle";
 
-  // ❌ [SRP + Function quá dài] Hàm này làm 3 việc: giải bậc 2, giải bậc 3, format kết quả.
-  //    Nên tách thành solveQuadratic(), solveCubic(), formatRoots().
   const solveEquation = (degree: number, coeffs: number[]): string[] => {
     const list: string[] = [];
 
     if (degree === 2) {
       const [a, b, c] = coeffs;
 
-      // ❌ [Lặp code] Validate a === 0 lặp lại ở cả nhánh bậc 2 và bậc 3 bên dưới
       if (a === 0) return ["Hệ số a ≠ 0"];
 
       const delta = b * b - 4 * a * c;
       if (delta > 0) {
         const x1 = (-b + Math.sqrt(delta)) / (2 * a);
         const x2 = (-b - Math.sqrt(delta)) / (2 * a);
-        // ❌ [Lặp code] Format "x = ..." lặp lại ở nhiều chỗ, nên tách formatRoot(label, value)
         list.push(`x1 = ${x1.toFixed(4)}`);
         list.push(`x2 = ${x2.toFixed(4)}`);
       } else if (delta === 0) {
@@ -62,7 +51,6 @@ export default function Home() {
       } else {
         const re = (-b / (2 * a)).toFixed(4);
         const im = (Math.sqrt(-delta) / (2 * a)).toFixed(4);
-        // ❌ [Lặp code] Format số phức lặp lại ở bậc 3 bên dưới
         list.push(`x1 = ${re} + ${im}i`);
         list.push(`x2 = ${re} - ${im}i`);
       }
@@ -71,7 +59,6 @@ export default function Home() {
     if (degree === 3) {
       const [a, b, c, d] = coeffs;
 
-      // ❌ [Lặp code] Validate a === 0 lặp lại lần 2
       if (a === 0) return ["Hệ số a ≠ 0"];
 
       const p = (3 * a * c - b * b) / (3 * a * a);
@@ -83,7 +70,6 @@ export default function Home() {
         const m = 2 * Math.sqrt(-p / 3);
         const theta = Math.acos((3 * q) / (p * m)) / 3;
         const offset = b / (3 * a);
-        // ❌ [Lặp code] Format x = ... lặp lại lần 3, 4, 5
         list.push(`x1 = ${(m * Math.cos(theta) - offset).toFixed(4)}`);
         list.push(
           `x2 = ${(m * Math.cos(theta - (2 * Math.PI) / 3) - offset).toFixed(4)}`,
@@ -97,7 +83,6 @@ export default function Home() {
         const v = Math.cbrt(-q / 2 - sqrtD);
         const re = (-(u + v) / 2 - b / (3 * a)).toFixed(4);
         const im = (((u - v) * Math.sqrt(3)) / 2).toFixed(4);
-        // ❌ [Lặp code] Format số phức lặp lại lần 2
         list.push(`x1 = ${(u + v - b / (3 * a)).toFixed(4)}`);
         list.push(`x2 = ${re} + ${im}i`);
         list.push(`x3 = ${re} - ${im}i`);
@@ -107,10 +92,8 @@ export default function Home() {
     return list;
   };
 
-  // --- Nút Mode ---
   const handleMode = () => {
     if (solverStep === "idle") {
-      // Vào mode solver, hiển thị PT đầu tiên
       setSolverStep("select");
       setDegreeIndex(0);
       setDisplay(DEGREE_LABELS[DEGREES[0]]);
@@ -119,7 +102,6 @@ export default function Home() {
     if (solverStep === "select") {
       const nextIndex = degreeIndex + 1;
       if (nextIndex >= DEGREES.length) {
-        // Hết PT → thoát về máy tính
         resetSolver();
       } else {
         setDegreeIndex(nextIndex);
@@ -127,12 +109,9 @@ export default function Home() {
       }
       return;
     }
-    // Đang nhập hoặc xem kết quả → Mode thoát về máy tính
     resetSolver();
   };
 
-  // ❌ [SRP + Function quá dài] handleOK xử lý cả: xác nhận chọn PT, validate + thu thập hệ số,
-  //    gọi solveEquation, điều hướng kết quả — nên tách nhỏ hơn.
   const handleOK = () => {
     if (solverStep === "select") {
       const degree = DEGREES[degreeIndex];
@@ -146,7 +125,6 @@ export default function Home() {
       const degree = DEGREES[degreeIndex];
       const value = parseFloat(display);
 
-      // ❌ [Lặp code] isNaN check lặp lại mỗi lần nhập hệ số thay vì tách validateCoeff()
       if (isNaN(value)) {
         setDisplay("Nhập số hợp lệ!");
         return;
@@ -158,14 +136,11 @@ export default function Home() {
       const totalNeeded = COEFF_LABELS[degree].length;
 
       if (newCoeffs.length < totalNeeded) {
-        // ❌ [Lặp code] isNaN check lặp lại mỗi lần nhập hệ số thay vì tách validateCoeff()
         setDisplay(`Nhập ${COEFF_LABELS[degree][newCoeffs.length]}:`);
         setWaitingForNext(true);
         return;
       }
 
-      // Đủ hệ số → giải
-      // ❌ [Lặp code] degree được lấy lại từ DEGREES[degreeIndex] thay vì dùng biến đã có
       const res = solveEquation(DEGREES[degreeIndex], newCoeffs);
       setResults(res);
       setResultIndex(0);
@@ -180,7 +155,6 @@ export default function Home() {
         setResultIndex(nextIdx);
         setDisplay(results[nextIdx]);
       } else {
-        // Hết nghiệm → về máy tính
         resetSolver();
       }
     }
@@ -196,7 +170,6 @@ export default function Home() {
     setWaitingForNext(false);
   };
 
-  // --- Máy tính thường ---
   const appendDigit = (digit: string) => {
     if (inSolver && solverStep !== "input") return;
     if (waitingForNext) {
@@ -252,7 +225,6 @@ export default function Home() {
     setWaitingForNext(false);
   };
 
-  // Hint hiển thị dưới màn hình
   const hint =
     solverStep === "select"
       ? "Mode: PT tiếp theo / OK: Xác nhận"
